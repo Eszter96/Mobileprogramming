@@ -1,39 +1,23 @@
 import React, { Component } from 'react';
 import {
+  ScrollView,
   StyleSheet,
   Text,
+  Button,
   View
 } from 'react-native';
-import CalendarPicker from 'react-native-calendar-picker';
+import  Calendar  from './components/Calendar';
+import  Home  from './components/Home';
  
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedStartDate: null,
-    };
-    this.onDateChange = this.onDateChange.bind(this);
-  }
- 
-  onDateChange(date) {
-    this.setState({
-      selectedStartDate: date,
-    });
-  }
-  render() {
-    const { selectedStartDate } = this.state;
-    const startDate = selectedStartDate ? selectedStartDate.toString() : '';
+  render(){
     return (
-      <View style={styles.container}>
-        <CalendarPicker
-          onDateChange={this.onDateChange}
-        />
- 
+      <ScrollView style={styles.container}>
         <View>
-          <Text>SELECTED DATE:{ startDate }</Text>
+          <Home />
         </View>
-      </View>
-    );
+      </ScrollView>
+    )
   }
 }
  
@@ -41,6 +25,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  calendar: {
+    backgroundColor: '#FFFFFF',
     marginTop: 100,
   },
+  footer: {
+    flex: 1,
+    //alignSelf:'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    justifyContent: 'flex-end',
+    backgroundColor: 'lightgrey',
+  },
+  menubtn: {
+  }
 });

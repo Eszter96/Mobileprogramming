@@ -1,0 +1,11 @@
+-Calendar-
+npm install --save react-native-calendar-picker
+npm install --save moment
+
+-Bottom Navigation-
+npm install react-navigation --save
+npm install react-native-gesture-handler --save
+npm install react-navigation-material-bottom-tabs --save
+npm install react-native-elements --save
+npm install react-native-vector-icons --save
+npm install react-native-paper --save
