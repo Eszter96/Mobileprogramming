@@ -13,9 +13,7 @@ export default class App extends Component {
   render(){
     return (
       <ScrollView style={styles.container}>
-        <View>
-          <Home />
-        </View>
+        <Home />
       </ScrollView>
     )
   }

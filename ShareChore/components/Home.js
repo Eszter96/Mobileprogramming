@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 
 import {createBottomTabNavigator, createAppContainer} from 'react-navigation';
 import {createMaterialBottomTabNavigator} from 'react-navigation-material-bottom-tabs';
@@ -8,7 +8,7 @@ import {Icon} from 'react-native-elements';
 import Calendar from './Calendar';
 import Settings from './Settings';
 
-export default class Home extends Component{
+class Home extends Component{
     render()
     {
         return(
@@ -36,7 +36,7 @@ const BottomMenu=createMaterialBottomTabNavigator(
         },
         Settings :{screen:Settings,
             navigationOptions:{
-                tabBarLabel:'Home',
+                tabBarLabel:'Settings',
                 activeColor:'#fff',
                 inactiveColor:'#000000',
                 barStyle:{backgroundColor:'lightgray'},
