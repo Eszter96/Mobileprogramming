@@ -1,0 +1,13 @@
+userhandling_poc/node_modules/**/*
+userhandling_poc/.expo/*
+userhandling_poc/npm-debug.*
+userhandling_poc/*.jks
+userhandling_poc/*.p8
+userhandling_poc/*.p12
+userhandling_poc/*.key
+userhandling_poc/*.mobileprovision
+userhandling_poc/*.orig.*
+userhandling_poc/web-build/
+
+# macOS
+.DS_Store
