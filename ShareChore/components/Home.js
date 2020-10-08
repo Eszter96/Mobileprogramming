@@ -1,13 +1,26 @@
+
+import React, { Component } from "react";
+import { View, Text, StyleSheet } from "react-native";
+=======
 import React, {Component} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 
-import {createBottomTabNavigator, createAppContainer} from 'react-navigation';
-import {createMaterialBottomTabNavigator} from 'react-navigation-material-bottom-tabs';
-import {Icon} from 'react-native-elements';
 
-import Calendar from './Calendar';
-import Settings from './Settings';
+import { createBottomTabNavigator, createAppContainer } from "react-navigation";
+import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
+import { Icon } from "react-native-elements";
 
+import Calendar from "./Calendar";
+
+const Home = () => {
+  return (
+    <View style={styles.container}>
+      <Calendar />
+    </View>
+  );
+};
+export default Home;
+=======
 class Home extends Component{
     render()
     {
@@ -52,13 +65,14 @@ const BottomMenu=createMaterialBottomTabNavigator(
 
 export default createAppContainer(BottomMenu);
 
+
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    testText: {
-        fontSize: 40,
-    }
-  });
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  testText: {
+    fontSize: 40,
+  },
+});
