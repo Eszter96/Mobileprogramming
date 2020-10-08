@@ -20,8 +20,6 @@
     "react-native-calendar-picker": "^7.0.1",
     "react-native-elements": "^2.3.2",
 
-    "react-native-gesture-handler": "~1.7.0",
-=======
     "react-native-gesture-handler": "^1.7.0",
 
     "react-native-paper": "^4.2.0",
