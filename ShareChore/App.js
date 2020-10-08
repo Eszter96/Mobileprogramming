@@ -1,18 +1,24 @@
-import React, { Component } from "react";
-import { ScrollView, StyleSheet, Text, Button, View } from "react-native";
-import Home from "./screens/Home";
-
-const App = () => {
-  return (
-    <ScrollView style={styles.container}>
-      <View>
+import React, { Component } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  Button,
+  View
+} from 'react-native';
+import  Calendar  from './components/Calendar';
+import  Home  from './components/Home';
+ 
+export default class App extends Component {
+  render(){
+    return (
+      <ScrollView style={styles.container}>
         <Home />
-      </View>
-    </ScrollView>
-  );
-};
-export default App;
-
+      </ScrollView>
+    )
+  }
+}
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
