@@ -1,14 +1,15 @@
-import { NavigationHelpersContext } from "@react-navigation/native";
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import { Button, View, Text, FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AvatarTransLator from "../components/AvatarTranslator";
 
+// This screen is used to assign user to a particular task
 const AddUserScreen = ({ route, navigation }) => {
   const [users, setUserList] = useState(route.params.users);
   const [user, setUser] = useState();
   const [isLoading, setLoading] = useState(true);
 
+  // AvatartTranslator is used to get the proper avatar (samr as in UserScreen and ListTask)
   function displayAvatar(filename) {
     const property = filename;
     return (
@@ -18,9 +19,12 @@ const AddUserScreen = ({ route, navigation }) => {
     );
   }
 
+  // Highlight selected user by id, by adding "active" property to the user we can render "active" user with a highlighted style
   const getId = (key) => {
     let newArray = [];
     let selectedUser;
+
+    // Iterating through the users and if we find the user with the id in the parameter (key), the user will be set to "active" (same logic as in UserInputScreen.js)
     users.forEach((element) => {
       let username = element.username;
       let filename = element.filename;
@@ -63,6 +67,7 @@ const AddUserScreen = ({ route, navigation }) => {
                   fontSize: 20,
                   paddingTop: 5,
                   marginLeft: 10,
+                  /* If the user is "active" then we set bold fontweight otherwise it will remain the same as before */
                   fontWeight: item.active ? "bold" : "normal",
                 }}
               >
@@ -75,10 +80,10 @@ const AddUserScreen = ({ route, navigation }) => {
       />
       <View>
         <Button
-          title="Assing"
+          title="Assign"
           onPress={() => {
             navigation.navigate("Home", { selectedUser: user });
-          }}
+          }} /* Sending back to HomeScreen.js (line 201) the selected user on button press */
         />
       </View>
     </View>

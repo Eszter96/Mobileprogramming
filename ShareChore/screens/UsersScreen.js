@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Text, View, FlatList, Button } from "react-native";
 import ListUsers from "../components/ListUsers";
 import AvatarTransLator from "../components/AvatarTranslator";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
+// This screen is used to display the users, and delete users from database
 const UsersScreen = ({ navigation }) => {
   const [users, setUsers] = useState([]);
   const [isLoading, setLoading] = useState(true);
 
   const deleteUser = async (id) => {
+    console.log(id);
     const response = await fetch(
       "https://inner-encoder-291018.ew.r.appspot.com/rest/userservice/deleteuser/" +
         id,
@@ -32,6 +34,7 @@ const UsersScreen = ({ navigation }) => {
     setLoading(false);
   };
 
+  // Display proper avatar using AvatarTransLator (same as in ListTasks and AddUserScreen)
   function displayAvatar(filename) {
     const property = filename;
     return (
@@ -43,8 +46,41 @@ const UsersScreen = ({ navigation }) => {
 
   if (isLoading == true) {
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <ListUsers setUsers={getUsers} />
+        <Text style={{ fontSize: 20, alignSelf: "center", marginVertical: 20 }}>
+          Users
+        </Text>
+        <FlatList
+          data={users}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 20,
+                marginLeft: 20,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                {displayAvatar(item.filename)}
+                <TouchableOpacity onLongPress={() => deleteUser(item.id)}>
+                  <Text style={{ fontSize: 20, paddingTop: 5, marginLeft: 10 }}>
+                    {item.username} ({item.points})
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+        <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
+          <Button
+            title="Add user"
+            onPress={() => {
+              navigation.navigate(" ");
+            }}
+          />
+        </View>
       </View>
     );
   } else {

@@ -3,9 +3,10 @@ import { Alert, Button, Text, View } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import styles from "../styles/MyStyles";
 import AvatarsData from "../components/AvatarsData";
-import ListUsers from "../components/ListUsers";
 
-const UserInput = (props) => {
+// This screen is used to add user to the database
+const UserInput = () => {
+  // Default value of the avatars is the data from AvatarsData
   const [avatars, setHighlighted] = useState(AvatarsData);
   const [fileName, setFileName] = useState("");
   const [userName, setUserName] = useState("");
@@ -35,6 +36,7 @@ const UserInput = (props) => {
     }
   });
 
+  // Get the filename and the id of the selected avatar
   const getSource = (filename, key) => {
     console.log(key);
     console.log(filename);
@@ -42,6 +44,7 @@ const UserInput = (props) => {
     setActiveImage(key);
   };
 
+  // Using the id of the selected avatar to set an avatar active (same logic as in AddUserScreen.js) - overwrite the AvatarsData for avatars
   const setActiveImage = (key) => {
     let newArray = [];
     avatars.map((avatar) => {
@@ -109,10 +112,12 @@ const UserInput = (props) => {
                 onPress={() => getSource(avatar.filename, avatar.id)}
               >
                 <View
+                  /* Set the style of an avatar depending on being active or not */
                   style={
                     avatar.active == true ? styles.active : styles.inactive
                   }
                 >
+                  {/* Getting Image component */}
                   {avatar.image}
                 </View>
               </TouchableOpacity>

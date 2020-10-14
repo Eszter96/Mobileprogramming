@@ -1,6 +1,8 @@
 import React from "react";
 import { Image, Text } from "react-native";
 
+// This file is getting called when the user selects avatar - UserInputScreen.js
+
 const AvatarsData = [
   {
     id: 1,
