@@ -12,9 +12,30 @@ const HomeTab = () => {
         name="Home"
         component={HomeScreen}
         options={{ headerShown: false }}
+        initialParams={{ task: "", selectedUser: "" }}
       />
-      <Stack.Screen name="AddTask" component={AddTaskScreen} />
-      <Stack.Screen name="AddUser" component={AddUserScreen} />
+      <Stack.Screen
+        name="AddTask"
+        component={AddTaskScreen}
+        options={{
+          title: "Add task",
+          headerStyle: {
+            backgroundColor: "grey",
+          },
+          headerTintColor: "#fff",
+        }}
+      />
+      <Stack.Screen
+        name="AddUser"
+        component={AddUserScreen}
+        options={{
+          title: "Add user",
+          headerStyle: {
+            backgroundColor: "grey",
+          },
+          headerTintColor: "#fff",
+        }}
+      />
     </Stack.Navigator>
   );
 };

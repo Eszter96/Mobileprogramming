@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, View, Text, FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AvatarTransLator from "../components/AvatarTranslator";
+import ListUsers from "../components/ListUsers";
 
 // This screen is used to assign user to a particular task
-const AddUserScreen = ({ route, navigation }) => {
-  const [users, setUserList] = useState(route.params.users);
+const AddUserScreen = ({ navigation }) => {
+  const [users, setUserList] = useState([]);
   const [user, setUser] = useState();
   const [isLoading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      setLoading(true);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   // AvatartTranslator is used to get the proper avatar (samr as in UserScreen and ListTask)
   function displayAvatar(filename) {
@@ -45,48 +54,66 @@ const AddUserScreen = ({ route, navigation }) => {
     setLoading(false);
   };
 
-  return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        data={users}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "column",
-              marginBottom: 20,
-              marginLeft: 20,
-            }}
-          >
-            <TouchableOpacity
-              style={{ flexDirection: "row" }}
-              onPress={() => getId(item.id)}
-            >
-              {displayAvatar(item.filename)}
-              <Text
+  const getUsers = (elements) => {
+    setLoading(true);
+    setUserList(elements);
+    setLoading(false);
+  };
+
+  if (isLoading == true) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ListUsers setUsers={getUsers} />
+      </View>
+    );
+  } else {
+    return (
+      <View style={{ flex: 1 }}>
+        <View style={{ marginTop: 20, flex: 1 }}>
+          <FlatList
+            data={users}
+            renderItem={({ item }) => (
+              <View
                 style={{
-                  fontSize: 20,
-                  paddingTop: 5,
-                  marginLeft: 10,
-                  /* If the user is "active" then we set bold fontweight otherwise it will remain the same as before */
-                  fontWeight: item.active ? "bold" : "normal",
+                  flexDirection: "column",
+                  marginBottom: 20,
+                  marginLeft: 20,
                 }}
               >
-                {item.username} ({item.points})
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flexDirection: "row" }}
+                  onPress={() => getId(item.id)}
+                >
+                  {displayAvatar(item.filename)}
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      paddingTop: 5,
+                      marginLeft: 10,
+                      /* If the user is "active" then we set bold fontweight otherwise it will remain the same as before */
+                      fontWeight: item.active ? "bold" : "normal",
+                    }}
+                  >
+                    {item.username} ({item.points})
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
+          <View>
+            <Button
+              title="Assign"
+              onPress={() => {
+                navigation.navigate("Home", {
+                  selectedUser: user,
+                });
+              }} /* Sending back to HomeScreen.js (line 201) the selected user on button press */
+            />
           </View>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
-      <View>
-        <Button
-          title="Assign"
-          onPress={() => {
-            navigation.navigate("Home", { selectedUser: user });
-          }} /* Sending back to HomeScreen.js (line 201) the selected user on button press */
-        />
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 };
 export default AddUserScreen;

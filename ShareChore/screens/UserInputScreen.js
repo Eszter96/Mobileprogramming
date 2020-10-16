@@ -13,7 +13,6 @@ const UserInput = () => {
   const [isLoading, setLoading] = useState(true);
 
   async function addData() {
-    console.log("These will be added: " + fileName, userName);
     const response = await fetch(
       "https://inner-encoder-291018.ew.r.appspot.com/rest/userservice/adduser",
       {
@@ -25,7 +24,6 @@ const UserInput = () => {
       }
     );
     const responseData = await response.text();
-    console.log(responseData);
     Alert.alert("User has been added!");
     setUserName("");
   }
@@ -38,8 +36,6 @@ const UserInput = () => {
 
   // Get the filename and the id of the selected avatar
   const getSource = (filename, key) => {
-    console.log(key);
-    console.log(filename);
     setFileName(filename);
     setActiveImage(key);
   };
@@ -127,13 +123,17 @@ const UserInput = () => {
       </View>
       <View
         style={{
-          width: "80%",
+          width: "100%",
           position: "absolute",
-          bottom: 10,
+          bottom: 0,
           alignSelf: "center",
         }}
       >
-        <Button title="Add User" onPress={addData} />
+        <Button
+          title="Add"
+          disabled={fileName != "" && userName != "" ? false : true}
+          onPress={addData}
+        />
       </View>
     </View>
   );

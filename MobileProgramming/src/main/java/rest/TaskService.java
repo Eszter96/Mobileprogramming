@@ -8,9 +8,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -108,6 +110,37 @@ public class TaskService {
 		}
 		
 		return t;
+	}
+	@DELETE
+	@Path("/deletetask/{p1}")
+	public void deleteUser(@PathParam("p1") int id) {
+		System.out.println(id);
+		String sql="delete from tasks where userid=?";
+		Connection conn=null;
+		try {
+		    if (SystemProperty.environment.value() ==SystemProperty.Environment.Value.Production) {  
+		    	conn = Connections.getProductionConnection();
+		    }
+		    else {
+		    	conn = Connections.getDevConnection();
+		    }
+		} catch (Exception e) {
+		}
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			pstmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if (conn!=null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+			}
+		}
+		
 	}
 }
 

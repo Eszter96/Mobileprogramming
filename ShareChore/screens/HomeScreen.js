@@ -7,11 +7,13 @@ import {
   Alert,
   TouchableHighlight,
   Button,
+  Image,
+  Modal,
 } from "react-native";
 import CalendarPicker from "react-native-calendar-picker";
 import DateData from "../components/DateData";
 import ListTasks from "../components/ListTasks";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import ListUsers from "../components/ListUsers";
 
 //This screen is used to display calendar also, add new tasks and view old ones
@@ -25,7 +27,7 @@ const HomeScreen = ({ route, navigation }) => {
   const [btnText, setBtnText] = useState("+"); // This enables or disables the user to add task
   const [selectedStartDate, setSelectedStartDate] = useState();
   const [selectedEndDate, setSelectedEndDate] = useState();
-
+  console.log(route.params?.task);
   async function addData() {
     const response = await fetch(
       "https://inner-encoder-291018.ew.r.appspot.com/rest/taskservice/addtask",
@@ -45,7 +47,7 @@ const HomeScreen = ({ route, navigation }) => {
 
     const responseData = await response.text();
     console.log(responseData);
-    setLoading(true);
+
     Alert.alert("Task has been added!");
 
     // Reset every possible value used on screen
@@ -54,13 +56,27 @@ const HomeScreen = ({ route, navigation }) => {
     setSelectedEndDate("");
     setSelectedStartDate("");
     filterTasks();
+    navigation.setParams({
+      task: "",
+      selectedUser: "",
+    });
+    setLoading(true);
   }
 
   // This is used to update changes (for example adding new user to the app) and set the screen to default state
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
+      if (
+        selectedStartDate != "" ||
+        selectedEndDate != "" ||
+        route.params?.task != "" ||
+        route.params?.selectedUser.username != ""
+      ) {
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
       filterTasks();
-      setLoading(true);
     });
 
     return unsubscribe;
@@ -75,19 +91,13 @@ const HomeScreen = ({ route, navigation }) => {
       // Filter tasks depending on selected date
       filterTasks(selectedD);
 
-      // If we don't want to add new task (so we find "+" sign in the round button), that means the range selection is disabled, but we can set the start date in case the user want to use that date as start date
-      if (btnText == "+") {
-        setSelectedStartDate(selectedD);
-        // If the range selection is enabled so the user wants to determine start and end date those will be set
+      // If there a date selected and the user presses the round button to add task, the already selected date will be set as start date so the end date can be set next
+      if (type === "END_DATE") {
+        setSelectedEndDate(selectedD);
+        // If the user want to choose a new start date (after end date is selected), we can set again the start date first
       } else {
-        // If there a date selected and the user presses the round button to add task, the already selected date will be set as start date so the end date can be set next
-        if (type === "END_DATE") {
-          setSelectedEndDate(selectedD);
-          // If the user want to choose a new start date (after end date is selected), we can set again the start date first
-        } else {
-          setSelectedStartDate(selectedD);
-          setSelectedEndDate(null);
-        }
+        setSelectedStartDate(selectedD);
+        setSelectedEndDate(null);
       }
     }
   };
@@ -103,24 +113,22 @@ const HomeScreen = ({ route, navigation }) => {
       setEnabled(false); // and disable range selection,
       setSelectedEndDate(""); // and reset the start date and end date as well
       setSelectedStartDate("");
+      navigation.setParams({
+        task: "",
+        selectedUser: "",
+      });
       filterTasks(); // reset filter as well
-      setLoading(true); // and update the calendar in case the user added new task
+      setLoading(true);
     }
   };
 
   // Get the users using the ListUsers component
-  const getUsers = (elements) => {
+  async function getUsers(elements) {
     setUsers(elements);
-    let usernames = [];
-    elements.forEach((element) => {
-      let username = element.username;
-      usernames.push(username);
-    });
-    setUserNames(usernames);
-  };
+  }
 
   // Get days using the DateData component
-  function getDays(customDatesStyles, taskData, startDates, endDates) {
+  async function getDays(customDatesStyles, taskData, startDates, endDates) {
     // Set an array for the dates which needs special styling
     let specialDaysArr = [];
 
@@ -189,35 +197,133 @@ const HomeScreen = ({ route, navigation }) => {
     setSelectedTasks(selectedTaskList);
   };
 
+  const refresh = () => {
+    setLoading(true);
+  };
+
   // Return view depending on the state of the round shaped button (296)
   function returnView() {
     if (btnText == "✕") {
       return (
-        <View>
-          <Text>Add Task</Text>
-          <Text>Select a range from the calendar!</Text>
-          <Text>Start date: {selectedStartDate}</Text>
-          <Text>End date: {selectedEndDate}</Text>
-          <Text>Assign task to: {route.params?.selectedUser.username}</Text>
-          <Text>Task: {route.params?.task}</Text>
-          <View style={{ width: "80%" }}>
-            <View>
-              <Button
-                title="Select user"
-                onPress={() => {
-                  navigation.navigate("AddUser", { users: users });
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            width: "100%",
+            backgroundColor: "grey",
+            paddingTop: 15,
+          }}
+        >
+          <View style={{ marginLeft: 30 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                marginBottom: 5,
+              }}
+            >
+              <Text style={{ fontSize: 16, color: "black" }}>Task: </Text>
+              <Text style={{ fontSize: 16, color: "white" }}>
+                {route.params?.task}
+              </Text>
+              <View>
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("AddTask")}
+                  >
+                    <Image
+                      style={{ width: "100%", height: "100%" }}
+                      source={require("../assets/edit_icon.png")}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                marginBottom: 5,
+              }}
+            >
+              <Text style={{ fontSize: 16, color: "black" }}>Assign to: </Text>
+              <Text style={{ fontSize: 16, color: "white" }}>
+                {route.params?.selectedUser.username}
+              </Text>
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
                 }}
-              />
+              >
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AddUser")}
+                >
+                  <Image
+                    style={{ width: "100%", height: "100%" }}
+                    source={require("../assets/edit_icon.png")}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View>
-              <Button
-                title="Add Task"
-                onPress={() => navigation.navigate("AddTask")}
-              />
+
+            <Text
+              style={{
+                fontSize: 15,
+                color: "black",
+                marginTop: 10,
+                marginBottom: 5,
+              }}
+            >
+              Select a range from the calendar!
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                marginBottom: 5,
+              }}
+            >
+              <Text style={{ fontSize: 15, color: "black", marginBottom: 5 }}>
+                Start date:{" "}
+              </Text>
+              <Text style={{ fontSize: 15, color: "white", marginBottom: 5 }}>
+                {selectedStartDate}
+              </Text>
             </View>
-            <View>
-              <Button title="Save" onPress={addData} />
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                marginBottom: 5,
+              }}
+            >
+              <Text style={{ fontSize: 15, color: "black", marginBottom: 5 }}>
+                End date:{" "}
+              </Text>
+              <Text style={{ fontSize: 15, color: "white", marginBottom: 5 }}>
+                {selectedEndDate}
+              </Text>
             </View>
+          </View>
+          <View style={{ marginTop: 5 }}>
+            <Button
+              title="Save"
+              disabled={
+                selectedStartDate != "" &&
+                selectedEndDate != "" &&
+                route.params?.task != "" &&
+                route.params?.selectedUser.username != ""
+                  ? false
+                  : true
+              }
+              onPress={addData}
+            />
           </View>
         </View>
       );
@@ -254,12 +360,9 @@ const HomeScreen = ({ route, navigation }) => {
   if (isLoading == true) {
     return (
       <View style={styles.container}>
-        <DateData onSendDates={getDays} />
         <ListUsers setUsers={getUsers} />
-        <Text style={{ fontSize: 20, alignSelf: "center", marginVertical: 20 }}>
-          ShareChore
-        </Text>
-        <CalendarPicker
+        <DateData onSendDates={getDays} />
+        {/* <CalendarPicker
           startFromMonday={true}
           allowRangeSelection={isEnabled}
           todayBackgroundColor="orange"
@@ -273,92 +376,127 @@ const HomeScreen = ({ route, navigation }) => {
           onDateChange={onDateChange}
         />
         {returnView()}
-        <View
-          style={{
-            position: "absolute",
-            bottom: "5%",
-            right: "10%",
-            backgroundColor: "grey",
-            width: 40,
-            height: 40,
-            justifyContent: "center",
-            borderRadius: 200,
-          }}
+        <TouchableHighlight
+          activeOpacity={0.6}
+          underlayColor="orange"
+          style={{ borderRadius: 200, width: 40, height: 40 }}
+          onPress={addTask}
         >
-          <TouchableHighlight
-            activeOpacity={0.6}
-            underlayColor="orange"
-            style={{ borderRadius: 200, width: 40, height: 40 }}
-            onPress={addTask}
-          >
-            <View>
-              <Text
-                style={{
-                  fontSize: 25,
-                  color: "white",
-                  alignSelf: "center",
-                  marginTop: 2,
-                }}
-              >
-                {btnText}
-              </Text>
-            </View>
-          </TouchableHighlight>
-        </View>
+          <View>
+            <Text
+              style={{
+                fontSize: 25,
+                color: "white",
+                alignSelf: "center",
+                marginTop: 2,
+              }}
+            >
+              {btnText}
+            </Text>
+          </View>
+        </TouchableHighlight> */}
       </View>
     );
   } else {
     return (
       <View style={styles.container}>
-        <Text style={{ fontSize: 20, alignSelf: "center", marginVertical: 20 }}>
-          ShareChore
-        </Text>
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={isEnabled}
-          todayBackgroundColor="orange"
-          todayTextStyle={{
-            fontWeight: "bold",
-            color: "white",
-          }}
-          selectedDayColor={"grey"}
-          selectedDayTextColor="#FFFFFF"
-          customDatesStyles={highlightedItems}
-          onDateChange={onDateChange}
-        />
-        {returnView()}
         <View
           style={{
-            position: "absolute",
-            bottom: "5%",
-            right: "10%",
-            backgroundColor: "grey",
-            width: 40,
-            height: 40,
-            justifyContent: "center",
-            borderRadius: 200,
+            backgroundColor: "white",
+            paddingTop: 15,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.8,
+            shadowRadius: 2,
+            elevation: 2,
           }}
         >
-          <TouchableHighlight
-            activeOpacity={0.6}
-            underlayColor="orange"
-            style={{ borderRadius: 200, width: 40, height: 40 }}
-            onPress={addTask}
+          <Text
+            style={{
+              fontSize: 20,
+              marginVertical: 20,
+              color: "#0693e3",
+              fontWeight: "bold",
+              marginLeft: 20,
+            }}
           >
-            <View>
-              <Text
-                style={{
-                  fontSize: 25,
-                  color: "white",
-                  alignSelf: "center",
-                  marginTop: 2,
-                }}
-              >
-                {btnText}
-              </Text>
-            </View>
-          </TouchableHighlight>
+            ShareChore
+          </Text>
+          <View
+            style={{
+              position: "absolute",
+              top: "50%",
+              right: "5%",
+              backgroundColor: "grey",
+              width: 30,
+              height: 30,
+              justifyContent: "center",
+              borderRadius: 200,
+            }}
+          >
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor="orange"
+              style={{ borderRadius: 200, width: 30, height: 30 }}
+              onPress={addTask}
+            >
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    color: "white",
+                    alignSelf: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {btnText}
+                </Text>
+              </View>
+            </TouchableHighlight>
+          </View>
+          <View
+            style={{
+              position: "absolute",
+              top: "50%",
+              right: "20%",
+              backgroundColor: "orange",
+              width: 30,
+              height: 30,
+              justifyContent: "center",
+              borderRadius: 200,
+            }}
+          >
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor="orange"
+              style={{ borderRadius: 200, width: 30, height: 30, padding: 5 }}
+              onPress={refresh}
+            >
+              <View>
+                <Image
+                  style={{ width: "100%", height: "100%" }}
+                  source={require("../assets/refreshicon.png")}
+                />
+              </View>
+            </TouchableHighlight>
+          </View>
         </View>
+        <View style={{ paddingTop: 10 }}>
+          <CalendarPicker
+            startFromMonday={true}
+            allowRangeSelection={isEnabled}
+            todayBackgroundColor="orange"
+            todayTextStyle={{
+              fontWeight: "bold",
+              color: "white",
+            }}
+            selectedDayColor={"grey"}
+            selectedDayTextColor="#FFFFFF"
+            customDatesStyles={highlightedItems}
+            onDateChange={onDateChange}
+          />
+        </View>
+        {returnView()}
       </View>
     );
   }
@@ -370,6 +508,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f1f1f1",
-    marginTop: 20,
   },
 });

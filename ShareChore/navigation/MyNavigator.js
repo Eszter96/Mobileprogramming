@@ -30,7 +30,7 @@ const MyNavigator = () => {
           name="Users"
           component={UsersTab}
           options={{
-            tabBarLabel: "Users",
+            tabBarLabel: "User Settings",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="account-settings"

@@ -12,7 +12,17 @@ const UsersTab = () => {
         component={UsersScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name=" " component={UserInputScreen} />
+      <Stack.Screen
+        name=" "
+        component={UserInputScreen}
+        options={{
+          title: "Add user",
+          headerStyle: {
+            backgroundColor: "grey",
+          },
+          headerTintColor: "#fff",
+        }}
+      />
     </Stack.Navigator>
   );
 };

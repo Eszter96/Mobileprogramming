@@ -112,7 +112,7 @@ public class UserService {
 	@Path("/deleteuser/{p1}")
 	public void deleteUser(@PathParam("p1") int id) {
 		System.out.println(id);
-		String sql="delete from users, tasks using users inner join tasks where users.userid = ? and users.userid = tasks.userid;";
+		String sql="delete from users where userid=?";
 		Connection conn=null;
 		try {
 		    if (SystemProperty.environment.value() ==SystemProperty.Environment.Value.Production) {  
