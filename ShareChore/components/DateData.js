@@ -30,13 +30,13 @@ const DateData = (props) => {
             let id = date.id;
             let userId = date.userId;
             let task = date.task;
-
+            let state = date.state;
             // Format dates
             let startDate = moment(Date.parse(date.startDate)).format(
               "YYYY-MM-DD"
             );
             let endDate = moment(Date.parse(date.endDate)).format("YYYY-MM-DD");
-            taskData.push({ task, startDate, endDate, userId, id });
+            taskData.push({ task, startDate, endDate, userId, id, state });
 
             // Adding style object including dates to the customDatesStyles array used by the calendar - if it is endDate it will be red border, if it is startDate it will be green
             customDatesStyles.push({

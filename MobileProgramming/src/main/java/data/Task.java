@@ -6,6 +6,15 @@ public class Task {
 	int userId;
 	String startDate;
 	String endDate;
+	String state;
+	
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
 
 	public int getId() {
 		return id;

@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/HomeScreen";
 import AddTaskScreen from "../screens/AddTaskScreen";
 import AddUserScreen from "../screens/AddUserScreen";
+import EditTaskScreen from "../screens/EditTaskScreen";
 
 const HomeTab = () => {
   const Stack = createStackNavigator();
@@ -12,24 +13,35 @@ const HomeTab = () => {
         name="Home"
         component={HomeScreen}
         options={{ headerShown: false }}
-        initialParams={{ task: "", selectedUser: "" }}
+        initialParams={{ editedTask: "", selectedUser: "" }}
       />
       <Stack.Screen
         name="AddTask"
         component={AddTaskScreen}
-        options={{
-          title: "Add task",
-          headerStyle: {
-            backgroundColor: "grey",
-          },
-          headerTintColor: "#fff",
-        }}
+        options={
+          (({ route }) => ({ title: route.params.title }),
+          { headerStyle: { backgroundColor: "grey" }, headerTintColor: "#fff" })
+        }
       />
       <Stack.Screen
         name="AddUser"
         component={AddUserScreen}
+        options={
+          (({ route }) => ({ title: route.params.title }),
+          {
+            headerStyle: {
+              backgroundColor: "grey",
+            },
+            headerTintColor: "#fff",
+          })
+        }
+      />
+      <Stack.Screen
+        name="EditTask"
+        component={EditTaskScreen}
+        initialParams={{ editedTask: "", selectedUser: "" }}
         options={{
-          title: "Add user",
+          title: "Edit task",
           headerStyle: {
             backgroundColor: "grey",
           },

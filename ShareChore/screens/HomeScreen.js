@@ -38,9 +38,10 @@ const HomeScreen = ({ route, navigation }) => {
         },
         body: JSON.stringify({
           userId: route.params?.selectedUser.id,
-          task: route.params?.task,
+          task: route.params?.editedTask,
           endDate: selectedEndDate,
           startDate: selectedStartDate,
+          state: "not completed",
         }),
       }
     );
@@ -57,7 +58,7 @@ const HomeScreen = ({ route, navigation }) => {
     setSelectedStartDate("");
     filterTasks();
     navigation.setParams({
-      task: "",
+      editedTask: "",
       selectedUser: "",
     });
     setLoading(true);
@@ -66,17 +67,7 @@ const HomeScreen = ({ route, navigation }) => {
   // This is used to update changes (for example adding new user to the app) and set the screen to default state
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      if (
-        selectedStartDate != "" ||
-        selectedEndDate != "" ||
-        route.params?.task != "" ||
-        route.params?.selectedUser.username != ""
-      ) {
-        setLoading(false);
-      } else {
-        setLoading(true);
-      }
-      filterTasks();
+      onDateChange();
     });
 
     return unsubscribe;
@@ -114,7 +105,7 @@ const HomeScreen = ({ route, navigation }) => {
       setSelectedEndDate(""); // and reset the start date and end date as well
       setSelectedStartDate("");
       navigation.setParams({
-        task: "",
+        editedTask: "",
         selectedUser: "",
       });
       filterTasks(); // reset filter as well
@@ -123,12 +114,12 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   // Get the users using the ListUsers component
-  async function getUsers(elements) {
+  function getUsers(elements) {
     setUsers(elements);
   }
 
   // Get days using the DateData component
-  async function getDays(customDatesStyles, taskData, startDates, endDates) {
+  function getDays(customDatesStyles, taskData, startDates, endDates) {
     // Set an array for the dates which needs special styling
     let specialDaysArr = [];
 
@@ -181,6 +172,9 @@ const HomeScreen = ({ route, navigation }) => {
         let task = t.task;
         let userId = t.userId;
         let endDate = t.endDate;
+        let startDate = t.startDate;
+        let state = t.state;
+        let id = t.id;
         let userName;
         let fileName;
 
@@ -191,7 +185,16 @@ const HomeScreen = ({ route, navigation }) => {
             fileName = user.filename;
           }
         });
-        selectedTaskList.push({ task, userId, endDate, userName, fileName });
+        selectedTaskList.push({
+          task,
+          state,
+          userId,
+          endDate,
+          startDate,
+          userName,
+          fileName,
+          id,
+        });
       }
     });
     setSelectedTasks(selectedTaskList);
@@ -199,7 +202,65 @@ const HomeScreen = ({ route, navigation }) => {
 
   const refresh = () => {
     setLoading(true);
+    filterTasks();
   };
+
+  const selectTask = (key) => {
+    let filteredTask = [];
+    selectedTasks.forEach((t) => {
+      let task = t.task;
+      let state = t.state;
+      let userId = t.userId;
+      let endDate = t.endDate;
+      let startDate = t.startDate;
+      let id = t.id;
+      let userName = t.userName;
+      let fileName = t.fileName;
+      let active;
+      if (id == key) {
+        active = true;
+      } else {
+        active = false;
+      }
+      filteredTask.push({
+        task,
+        state,
+        userId,
+        endDate,
+        startDate,
+        id,
+        userName,
+        fileName,
+        active,
+      });
+    });
+    setSelectedTasks(filteredTask);
+  };
+
+  function returnBtn(taskdata) {
+    if (taskdata.active == true) {
+      return (
+        <TouchableOpacity
+          onPress={() => navigation.navigate("EditTask", { task: taskdata })}
+          style={{
+            width: 30,
+            height: 30,
+            backgroundColor: "orange",
+            borderRadius: 200,
+            padding: 5,
+            marginLeft: 30,
+          }}
+        >
+          <Image
+            style={{ width: "100%", height: "100%" }}
+            source={require("../assets/edit_icon.png")}
+          />
+        </TouchableOpacity>
+      );
+    } else {
+      return null;
+    }
+  }
 
   // Return view depending on the state of the round shaped button (296)
   function returnView() {
@@ -224,7 +285,7 @@ const HomeScreen = ({ route, navigation }) => {
             >
               <Text style={{ fontSize: 16, color: "black" }}>Task: </Text>
               <Text style={{ fontSize: 16, color: "white" }}>
-                {route.params?.task}
+                {route.params?.editedTask}
               </Text>
               <View>
                 <View
@@ -234,7 +295,12 @@ const HomeScreen = ({ route, navigation }) => {
                   }}
                 >
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("AddTask")}
+                    onPress={() =>
+                      navigation.navigate("AddTask", {
+                        title: "Add task",
+                        page: "Home",
+                      })
+                    }
                   >
                     <Image
                       style={{ width: "100%", height: "100%" }}
@@ -262,7 +328,12 @@ const HomeScreen = ({ route, navigation }) => {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("AddUser")}
+                  onPress={() =>
+                    navigation.navigate("AddUser", {
+                      title: "Add User",
+                      page: "Home",
+                    })
+                  }
                 >
                   <Image
                     style={{ width: "100%", height: "100%" }}
@@ -317,7 +388,7 @@ const HomeScreen = ({ route, navigation }) => {
               disabled={
                 selectedStartDate != "" &&
                 selectedEndDate != "" &&
-                route.params?.task != "" &&
+                route.params?.editedTask != "" &&
                 route.params?.selectedUser.username != ""
                   ? false
                   : true
@@ -341,14 +412,26 @@ const HomeScreen = ({ route, navigation }) => {
             keyExtractor={(item) => selectedTasks.indexOf(item).toString()}
             data={selectedTasks}
             renderItem={(itemData) => (
-              <View key={itemData.item.id}>
-                <ListTasks
-                  task={itemData.item.task}
-                  endDate={itemData.item.endDate}
-                  id={itemData.item.id}
-                  fileName={itemData.item.fileName}
-                  userName={itemData.item.userName}
-                />
+              <View
+                key={itemData.item.id}
+                style={{ marginBottom: 5, flexDirection: "row" }}
+              >
+                <TouchableOpacity
+                  onPress={() => selectTask(itemData.item.id)}
+                  style={{ flexDirection: "row" }}
+                >
+                  <ListTasks
+                    task={itemData.item.task}
+                    endDate={itemData.item.endDate}
+                    userId={itemData.item.userId}
+                    fileName={itemData.item.fileName}
+                    userName={itemData.item.userName}
+                    id={itemData.item.id}
+                    active={itemData.item.active}
+                    state={itemData.item.state}
+                  />
+                </TouchableOpacity>
+                {returnBtn(itemData.item)}
               </View>
             )}
           />

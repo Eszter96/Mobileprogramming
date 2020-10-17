@@ -112,7 +112,7 @@ const UsersScreen = ({ navigation }) => {
                 {displayAvatar(item.filename)}
                 <TouchableOpacity onLongPress={() => deleteUser(item.id)}>
                   <Text style={{ fontSize: 20, paddingTop: 5, marginLeft: 10 }}>
-                    {item.username} ({item.points})
+                    {item.username}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -175,7 +175,7 @@ const UsersScreen = ({ navigation }) => {
                       <Text
                         style={{ fontSize: 20, paddingTop: 5, marginLeft: 10 }}
                       >
-                        {item.username} ({item.points})
+                        {item.username}
                       </Text>
                     </TouchableOpacity>
                   </View>

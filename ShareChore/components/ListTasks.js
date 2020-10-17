@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Image } from "react-native";
 import AvatarTransLator from "./AvatarTranslator";
+import moment from "moment";
 
 // This is used by HomeScreen to display the tasks when a date is selected
 
@@ -14,13 +15,67 @@ const ListTasks = (props) => {
       </View>
     );
   }
+
+  const date = new Date();
+  const formattedDate = moment(date).format("YYYY-MM-DD");
+
+  function displayState() {
+    if (props.state == "completed") {
+      return (
+        <View>
+          <Text style={{ color: "green", fontSize: 18, marginRight: 15 }}>
+            COMPLETED
+          </Text>
+        </View>
+      );
+    } else {
+      return (
+        <Text
+          style={{
+            fontSize: 18,
+            color: formattedDate > props.endDate ? "grey" : "red",
+            marginRight: 15,
+          }}
+        >
+          Due to: {props.endDate}
+        </Text>
+      );
+    }
+  }
+  console.log(formattedDate + ", " + props.endDate);
+  console.log(props.id);
   // Display tasks and resposible user using the data of selectedTasks (as props) from the HomeScreen
   return (
-    <View style={{ flexDirection: "row", marginLeft: 20 }}>
-      <Text>{props.task} </Text>
-      <Text style={{ color: "red" }}>Due to: {props.endDate} </Text>
-      {displayAvatar(props.fileName)}
-      <Text>{props.userName} </Text>
+    <View
+      style={{
+        flexDirection: "column",
+        borderBottomWidth: 2,
+        borderColor: props.active == true ? "#cfcfcf" : "#f1f1f1",
+      }}
+    >
+      <View style={{ marginHorizontal: 20 }}>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: props.active == true ? "bold" : "normal",
+          }}
+        >
+          {props.task}{" "}
+        </Text>
+        <View style={{ flexDirection: "row" }}>
+          {displayState()}
+          {displayAvatar(props.fileName)}
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: props.active == true ? "bold" : "normal",
+            }}
+          >
+            {" "}
+            {props.userName}{" "}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };
