@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Image } from "react-native";
+import React from "react";
+import { Text, View } from "react-native";
 import AvatarTransLator from "./AvatarTranslator";
 import moment from "moment";
 
 // This is used by HomeScreen to display the tasks when a date is selected
-
 const ListTasks = (props) => {
   // Getting avatars using the AvatarTranslator (same as in AddUserScreen and UserScreen)
   function displayAvatar(filename) {
@@ -33,7 +32,7 @@ const ListTasks = (props) => {
         <Text
           style={{
             fontSize: 18,
-            color: formattedDate > props.endDate ? "grey" : "red",
+            color: formattedDate > props.endDate ? "grey" : "red", // Set to grey due to text if the task is overdue
             marginRight: 15,
           }}
         >
@@ -42,8 +41,7 @@ const ListTasks = (props) => {
       );
     }
   }
-  console.log(formattedDate + ", " + props.endDate);
-  console.log(props.id);
+
   // Display tasks and resposible user using the data of selectedTasks (as props) from the HomeScreen
   return (
     <View

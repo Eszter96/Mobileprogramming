@@ -108,7 +108,7 @@ const UserInput = (props) => {
                 navigation.navigate(props.page, {
                   selectedUser: user,
                 });
-              }} /* Sending back to HomeScreen.js (line 201) the selected user on button press */
+              }} // Sending back the selected user to the sceen has been sent to this component as property
             />
           </View>
         </View>

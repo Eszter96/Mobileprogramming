@@ -4,7 +4,7 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import styles from "../styles/MyStyles";
 import AvatarsData from "../components/AvatarsData";
 
-// This screen is used to add user to the database
+// This screen is used to add user to the users database
 const UserInput = () => {
   // Default value of the avatars is the data from AvatarsData
   const [avatars, setHighlighted] = useState(AvatarsData);
@@ -40,7 +40,7 @@ const UserInput = () => {
     setActiveImage(key);
   };
 
-  // Using the id of the selected avatar to set an avatar active (same logic as in AddUserScreen.js) - overwrite the AvatarsData for avatars
+  // Using the id of the selected avatar to set an avatar active (same logic as in UserInput.js for highlighting the selected user) - overwrite the AvatarsData for avatars
   const setActiveImage = (key) => {
     let newArray = [];
     avatars.map((avatar) => {

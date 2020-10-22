@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useState } from "react";
 import moment from "moment";
 import {
   StyleSheet,
@@ -8,7 +8,6 @@ import {
   TouchableHighlight,
   Button,
   Image,
-  Modal,
 } from "react-native";
 import CalendarPicker from "react-native-calendar-picker";
 import DateData from "../components/DateData";
@@ -18,16 +17,16 @@ import ListUsers from "../components/ListUsers";
 
 //This screen is used to display calendar also, add new tasks and view old ones
 const HomeScreen = ({ route, navigation }) => {
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true); // This used to reload page or at the beginning to get the datas from components before the screen displays the calendar: delete date selection, display changes in tasks
   const [highlightedItems, setHighlightedItems] = useState([]); // Contains styles for start and end dates of tasks
   const [taskList, setTaskList] = useState([]);
-  const [selectedTasks, setSelectedTasks] = useState([]);
+  const [selectedTasks, setSelectedTasks] = useState([]); // The result of the filterTasks function whenever the user clicks another date
   const [users, setUsers] = useState([]);
   const [isEnabled, setEnabled] = useState(false); // This enables or disables the user to select range from calendar
   const [btnText, setBtnText] = useState("+"); // This enables or disables the user to add task
   const [selectedStartDate, setSelectedStartDate] = useState();
   const [selectedEndDate, setSelectedEndDate] = useState();
-  console.log(route.params?.task);
+
   async function addData() {
     const response = await fetch(
       "https://inner-encoder-291018.ew.r.appspot.com/rest/taskservice/addtask",
@@ -97,7 +96,7 @@ const HomeScreen = ({ route, navigation }) => {
   const addTask = () => {
     // If there was "+" sign on the button when it was clicked,
     if (btnText == "+") {
-      setEnabled(true); // the range selection will be enabled (line ~270),
+      setEnabled(true); // the range selection will be enabled,
       setBtnText("✕"); // and the text on the button will be switched to X
     } else {
       setBtnText("+"); // Otherwise set back the button to + sign,
@@ -108,8 +107,8 @@ const HomeScreen = ({ route, navigation }) => {
         editedTask: "",
         selectedUser: "",
       });
-      filterTasks(); // reset filter as well
-      setLoading(true);
+      // Refresh page if escape from the add task view
+      refresh();
     }
   };
 
@@ -130,7 +129,7 @@ const HomeScreen = ({ route, navigation }) => {
       }
     });
 
-    // Set an array for the final styles, which doen't include any duplication also has there the special dates with combined styles
+    // Set an array for the final styles, which doesn't include any duplication also has there the special dates with combined styles
     let filteredCustomDatesStyles = [];
 
     // Set an array for all the dates in order to detect duplications
@@ -140,7 +139,7 @@ const HomeScreen = ({ route, navigation }) => {
     customDatesStyles.map((cDS) => {
       let date = cDS.date;
       if (!allDays.includes(date)) {
-        // Proceed only the days which is not included yet in the allDays array
+        // Proceed only with those days which are not included yet in the allDays array
         if (!specialDaysArr.includes(date)) {
           // If the date is not included in the specialDayArr then the actual whole element from the customDatesStyles will be added to the filtered array as it is
           filteredCustomDatesStyles.push(cDS);
@@ -158,7 +157,7 @@ const HomeScreen = ({ route, navigation }) => {
         allDays.push(date); // If the date in question wasn't included yet in the allDays array it will be added to prevent duplication for that day
       }
     });
-    setHighlightedItems(filteredCustomDatesStyles); // Set equal the highlightedItems with the filtered array which will be used in the calendar as "customDatesStyles" (line ~271)
+    setHighlightedItems(filteredCustomDatesStyles); // Set equal the highlightedItems with the filtered array which will be used in the calendar as "customDatesStyles"
     setTaskList(taskData);
     setLoading(false);
   }
@@ -167,7 +166,7 @@ const HomeScreen = ({ route, navigation }) => {
   // Filter tasks by the selected date
   const filterTasks = (selectedD) => {
     taskList.forEach((t) => {
-      // We get the task even if not a start date or an end date is selected, but the date in fitting in the range of the endDate and startDate of a particular task
+      // Get the task even if not a start date or an end date is selected, but the date in fitting in the range of the endDate and startDate of a particular task
       if (selectedD >= t.startDate && t.endDate >= selectedD) {
         let task = t.task;
         let userId = t.userId;
@@ -178,13 +177,15 @@ const HomeScreen = ({ route, navigation }) => {
         let userName;
         let fileName;
 
-        // We get which user the task is assigned to by the userid which is included in the tasks table as well
+        // Get which user the task is assigned to by the userid which is included in the tasks table in the database as well
+        // Set as userName and fileName value the proper username and filename for the avatar (which comes from the users database)
         users.forEach((user) => {
           if (user.id == userId) {
             userName = user.username;
             fileName = user.filename;
           }
         });
+
         selectedTaskList.push({
           task,
           state,
@@ -200,11 +201,13 @@ const HomeScreen = ({ route, navigation }) => {
     setSelectedTasks(selectedTaskList);
   };
 
+  // This function is called when the user presses the refresh button
   const refresh = () => {
     setLoading(true);
     filterTasks();
   };
 
+  // Make active the selected task so the user will be allowed to edit that particular task by displaying there an edit button (returnnBtn)
   const selectTask = (key) => {
     let filteredTask = [];
     selectedTasks.forEach((t) => {
@@ -262,7 +265,7 @@ const HomeScreen = ({ route, navigation }) => {
     }
   }
 
-  // Return view depending on the state of the round shaped button (296)
+  // Return view depending on the state of the grey round button on the top of the screen "x/+"
   function returnView() {
     if (btnText == "✕") {
       return (
@@ -297,8 +300,8 @@ const HomeScreen = ({ route, navigation }) => {
                   <TouchableOpacity
                     onPress={() =>
                       navigation.navigate("AddTask", {
-                        title: "Add task",
-                        page: "Home",
+                        title: "Add task", // This will be the header title of the screen we navigate to (see AddTaskScreen.js)
+                        page: "Home", // Navigate to Add Task screen and send to that screen the name of the screen where from we navigate there so the data will be sent back to this screen
                       })
                     }
                   >
@@ -330,7 +333,7 @@ const HomeScreen = ({ route, navigation }) => {
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("AddUser", {
-                      title: "Add User",
+                      title: "Add User", // Same logic here as in case of adding task
                       page: "Home",
                     })
                   }
@@ -386,6 +389,7 @@ const HomeScreen = ({ route, navigation }) => {
             <Button
               title="Save"
               disabled={
+                // Keep disabled the button until the user doesn't give every data needed to create a new task
                 selectedStartDate != "" &&
                 selectedEndDate != "" &&
                 route.params?.editedTask != "" &&
@@ -407,7 +411,7 @@ const HomeScreen = ({ route, navigation }) => {
             marginTop: 20,
           }}
         >
-          {/* Display the result of filterTasks() (168)*/}
+          {/* Display the result of filterTasks()*/}
           <FlatList
             keyExtractor={(item) => selectedTasks.indexOf(item).toString()}
             data={selectedTasks}
@@ -439,45 +443,12 @@ const HomeScreen = ({ route, navigation }) => {
       );
     }
   }
-  // While the screen is loading get datas from different components, but until that diplay the basic view then the refreshed view
+  // While the screen is loading get datas from different components
   if (isLoading == true) {
     return (
       <View style={styles.container}>
         <ListUsers setUsers={getUsers} />
         <DateData onSendDates={getDays} />
-        {/* <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={isEnabled}
-          todayBackgroundColor="orange"
-          todayTextStyle={{
-            fontWeight: "bold",
-            color: "white",
-          }}
-          selectedDayColor={"grey"}
-          selectedDayTextColor="#FFFFFF"
-          customDatesStyles={highlightedItems}
-          onDateChange={onDateChange}
-        />
-        {returnView()}
-        <TouchableHighlight
-          activeOpacity={0.6}
-          underlayColor="orange"
-          style={{ borderRadius: 200, width: 40, height: 40 }}
-          onPress={addTask}
-        >
-          <View>
-            <Text
-              style={{
-                fontSize: 25,
-                color: "white",
-                alignSelf: "center",
-                marginTop: 2,
-              }}
-            >
-              {btnText}
-            </Text>
-          </View>
-        </TouchableHighlight> */}
       </View>
     );
   } else {

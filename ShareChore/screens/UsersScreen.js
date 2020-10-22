@@ -69,6 +69,7 @@ const UsersScreen = ({ navigation }) => {
     );
   }
 
+  // While getting data needed to diplay the list of users
   if (isLoading == true) {
     return (
       <View style={{ flex: 1 }}>

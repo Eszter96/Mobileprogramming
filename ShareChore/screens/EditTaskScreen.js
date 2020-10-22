@@ -4,23 +4,31 @@ import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+//This screen can be reached by clicking the edit button for an already existing task appears for selected day
 const EditTaskScreen = ({ route, navigation }) => {
   const [selectedEndDate, setEndDate] = useState(route.params.task.endDate);
   const [completed, setCompleted] = useState("");
   const [color, setColor] = useState("");
 
+  // The editedTask has an initial parameter (see HomeTab screen) which is an empty string. If that's changing that new value will be set for the task variable.
   let task =
     route.params?.editedTask != ""
       ? route.params?.editedTask
       : route.params.task.task;
+
+  // The same logic here as in case of editedTask
   let username =
     route.params?.selectedUser != ""
       ? route.params?.selectedUser.username
       : route.params.task.userName;
+
+  // The since the selectedUser contains both username and id, we can get the id from it (see UserInput.js component)
   let userId =
     route.params?.selectedUser != ""
       ? route.params?.selectedUser.id
       : route.params.task.userId;
+
+  // Indicate the startdate of the task what the user want to edit
   let customDatesStyles = [
     {
       date: route.params.task.startDate,
@@ -30,6 +38,15 @@ const EditTaskScreen = ({ route, navigation }) => {
     },
   ];
 
+  // By setting the mindate will be disabled those dates what are before the start date or if the currend date is bigger then the start date the we set that as mindate
+  const date = new Date(); // Get current date
+  const formattedDate = moment(date).format("YYYY-MM-DD");
+  let minDate =
+    route.params.task.startDate > formattedDate
+      ? route.params.task.startDate
+      : formattedDate;
+
+  // With this function we can save the changes
   async function saveData() {
     const response = await fetch(
       "https://inner-encoder-291018.ew.r.appspot.com/rest/taskservice/edittask",
@@ -54,13 +71,16 @@ const EditTaskScreen = ({ route, navigation }) => {
     Alert.alert("Task has been modified!");
   }
 
-  const onDateChange = (date, type) => {
+  // The selected date will be set to the endDate
+  const onDateChange = (date) => {
     if (date != null) {
       let selectedD = moment(Date.parse(date)).format("YYYY-MM-DD");
       setEndDate(selectedD);
     }
   };
 
+  // If the user press the "completed" text then it becomes green indicating that the user set the status to complete, and if the "Not completed" text is selected then it becomes red
+  // The other text will be always set back to grey
   const changeStatus = (status) => {
     setCompleted(status);
     if (status == "completed") {
@@ -70,12 +90,6 @@ const EditTaskScreen = ({ route, navigation }) => {
     }
   };
 
-  const date = new Date();
-  const formattedDate = moment(date).format("YYYY-MM-DD");
-  let minDate =
-    route.params.task.startDate > formattedDate
-      ? route.params.task.startDate
-      : formattedDate;
   return (
     <View style={styles.container}>
       <View style={{ paddingTop: 10 }}>

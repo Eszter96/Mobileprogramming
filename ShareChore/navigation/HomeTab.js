@@ -19,7 +19,7 @@ const HomeTab = () => {
         name="AddTask"
         component={AddTaskScreen}
         options={
-          (({ route }) => ({ title: route.params.title }),
+          (({ route }) => ({ title: route.params.title }), // Set title according to how the users wants to use the particular screen (add/edit)
           { headerStyle: { backgroundColor: "grey" }, headerTintColor: "#fff" })
         }
       />
@@ -27,7 +27,7 @@ const HomeTab = () => {
         name="AddUser"
         component={AddUserScreen}
         options={
-          (({ route }) => ({ title: route.params.title }),
+          (({ route }) => ({ title: route.params.title }), // Set title according to how the users wants to use the particular screen (add/edit)
           {
             headerStyle: {
               backgroundColor: "grey",

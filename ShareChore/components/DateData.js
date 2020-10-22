@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import moment from "moment";
 
-// This file is fetching the data from the tasks table
+// This file is fetching the data from the tasks table, which is used by the HomeScreen.js
 
 const DateData = (props) => {
   const [hasError, setErrors] = useState(false);
@@ -24,7 +24,7 @@ const DateData = (props) => {
           let startDates = [];
           let endDates = [];
           let taskData = [];
-          let customDatesStyles = []; // Array of styles for particular days depending on being endDate or startDate
+          let customDatesStyles = []; // Array of styles for particular days depending on being endDate or startDate of a task
 
           data.forEach((date) => {
             let id = date.id;

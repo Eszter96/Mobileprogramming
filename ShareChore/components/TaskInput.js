@@ -37,7 +37,7 @@ const TaskInput = (props) => {
           onPress={() => {
             navigation.navigate(props.page, {
               editedTask: task,
-            }); /* Sending back the received data from input to the HomeScreen (line 202) */
+            }); // Sending back the received data from input to that page what has been sent to this component to navigate to
           }}
         />
       </View>
